@@ -1,0 +1,12 @@
+server:
+  port: 8080
+
+db:
+  kind: postgresql
+  username: yyufbzhz
+  password: GeC-i04_62Sp4sZ5mHYXZZWlTwapNWr0
+  url: jdbc:postgresql://bubble.db.elephantsql.com/yyufbzhz
+
+hibernate:
+  ddl:
+    auto: none

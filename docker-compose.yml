@@ -1,0 +1,43 @@
+version: '3'
+services:
+  proxy:
+    image: traefik
+    command: --api.insecure=true --providers.docker
+    ports:
+      - "8081:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  app-authors-service:
+    image: localhost/app-authors:1.0.0
+    deploy:
+      replicas: 1
+    expose:
+      - 9090
+    labels:
+      - "traefik.http.routers.authors.rule=PathPrefix(`/app-authors`)"
+      - "traefik.http.middlewares.authors.stripprefix.prefixes=/app-authors"
+      - "traefik.http.routers.authors.middlewares=authors"
+    #ports:
+    #  - "9090:9090"
+  app-books-service:
+    image: localhost/app-books:1.0.0
+    environment:
+      APP_AUTHORS_URL: http://proxy/app-authors
+      #APP_AUTHORS_HOST: app-authors-service
+      #APP_AUTHORS_PORT: 9090
+    deploy:
+      replicas: 1
+    expose:
+      - 8080
+    labels:
+      - "traefik.http.routers.books.rule=PathPrefix(`/app-books`)"
+      - "traefik.http.middlewares.books.stripprefix.prefixes=/app-books"
+      - "traefik.http.routers.books.middlewares=books"
+#    healthcheck:
+#      test: curl --fail http://localhost:8080/1/live || exit 1
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
+    #ports:
+    #  - "8080:8080"
